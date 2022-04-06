@@ -1,46 +1,56 @@
 import * as THREE from "three";
-import { BoxGeometry, MeshBasicMaterial } from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+
+const cursor = {
+  x: 0,
+  y: 0,
+}
+
+addEventListener("mousemove", (event) => {
+  cursor.x = event.clientX / width - 0.5;
+  cursor.y = event.clientY / height - 0.5;
+});
+
+const canvas = document.querySelector(".webgl");
 
 const width = 400;
 const height = 300;
 const scene = new THREE.Scene();
 
-const group = new THREE.Group();
-group.position.y = -1;
-group.rotation.x = 1;
-group.scale.z = 2;
-scene.add(group);
+const mesh = new THREE.Mesh(
+  new THREE.BoxGeometry(1, 1, 1),
+  new THREE.MeshBasicMaterial({ color: 0x0000ff})
+);
+scene.add(mesh);
 
-const cube1 = new THREE.Mesh(
-  new BoxGeometry(1, 1, 1),
-  new MeshBasicMaterial({ color: 0xff0000})
-)
-group.add(cube1);
-
-const cube2 = new THREE.Mesh(
-  new BoxGeometry(1, 1, 1),
-  new MeshBasicMaterial({ color: 0x00ff00})
-)
-cube2.position.x = -2;
-group.add(cube2);
-
-const cube3 = new THREE.Mesh(
-  new BoxGeometry(1, 1, 1),
-  new MeshBasicMaterial({ color: 0x0000ff})
-)
-cube3.position.x = 2;
-group.add(cube3);
-
-const axesHelper = new THREE.AxesHelper(2);
-scene.add(axesHelper);
-
-const camera = new THREE.PerspectiveCamera(75, width/height, 0.1, 1000);
+// const aspectRatio = width / height;
+// const camera = new THREE.OrthographicCamera(-1*aspectRatio,1*aspectRatio,1,-1,0.1,100);
+const camera = new THREE.PerspectiveCamera(75, width/height, 0.1, 100);
 camera.position.z = 3;
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
 
-const canvas = document.querySelector(".webgl");
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas
 });
 renderer.setSize(width, height);
 
-renderer.render(scene, camera);
+// const clock = new THREE.Clock();
+const tick = () => {
+  // const elapsedTime = clock.getElapsedTime();
+  // mesh.rotation.y = elapsedTime;
+
+  // custom controls
+  // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 2;
+  // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 2;
+  // camera.position.y = -cursor.y * 5;
+  // camera.lookAt(mesh.position);
+
+  controls.update();
+  
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(tick);
+}
+
+tick();
