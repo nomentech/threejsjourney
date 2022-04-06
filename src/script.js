@@ -1,11 +1,20 @@
 import "./style.css";
 import * as THREE from "three";
+import * as dat from "dat.gui";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+
+const gui = new dat.GUI();
+const parameters = {
+  color: 0xb3b3b3,
+  spin: () => {
+    mesh.rotation.y += 10;
+  }
+};
 
 const cursor = {
   x: 0,
   y: 0,
-}
+};
 
 addEventListener("mousemove", (event) => {
   cursor.x = event.clientX / size.width - 0.5;
@@ -40,23 +49,38 @@ const canvas = document.querySelector(".webgl");
 
 const scene = new THREE.Scene();
 
-const geometry = new THREE.BufferGeometry()
-const count = 500;
-const positionArray = new Float32Array(count*3*3);
-for (let i=0; i< count*3*3; i++) {
-  positionArray[i] = (Math.random() - 0.5) * 4;
-}
-const positionAttribute = new THREE.BufferAttribute(positionArray, 3);
-geometry.setAttribute("position", positionAttribute);
+const geometry = new THREE.BoxGeometry(1, 1, 1);
 
 const material = new THREE.MeshBasicMaterial({ 
-  color: 0x0000ff,
-  wireframe: true
+  color: parameters.color,
+  wireframe: false
 })
 
 const mesh = new THREE.Mesh(geometry, material);
-
 scene.add(mesh);
+
+// debug
+gui
+  .addColor(parameters, "color")
+  .onChange(() => {
+    material.color.set(parameters.color);
+  })
+
+gui
+  .add(mesh.position, "y")
+  .min(-3)
+  .max(3)
+  .step(0.01)
+  .name("elavation");
+
+gui
+  .add(parameters, "spin");
+  
+gui
+  .add(mesh, "visible");
+
+gui
+  .add(material, "wireframe");
 
 const camera = new THREE.PerspectiveCamera(75, size.width/size.height, 0.1, 100);
 camera.position.z = 3;
