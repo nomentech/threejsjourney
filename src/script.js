@@ -3,7 +3,33 @@ import * as THREE from "three";
 import * as dat from "dat.gui";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-const gui = new dat.GUI();
+const gui = new dat.GUI({ closed: true });
+
+// Texture
+const loadingManager = new THREE.LoadingManager();
+loadingManager.onStart = () => {
+  console.log("onStart");
+}
+loadingManager.onLoad = () => {
+  console.log("onLoad");
+}
+loadingManager.onProgress = () => {
+  console.log("onProgress");
+}
+loadingManager.onError = () => {
+  console.log("onError");
+}
+const textureLoader = new THREE.TextureLoader(loadingManager);
+const alphaTexture = textureLoader.load("textures/door/alpha.jpg");
+const ambientOcclusionTexture = textureLoader.load("textures/door/ambientOcclusion.jpg");
+const colorTexture = textureLoader.load("textures/door/color.jpg");
+const heightTexture = textureLoader.load("textures/door/height.jpg");
+const metalnessTexture = textureLoader.load("textures/door/metalness.jpg");
+const normalTexture = textureLoader.load("textures/door/normal.jpg");
+const roughnessTexture = textureLoader.load("textures/door/roughness.jpg");
+
+colorTexture.magFilter = THREE.NearestFilter;
+
 const parameters = {
   color: 0xb3b3b3,
   spin: () => {
@@ -52,7 +78,8 @@ const scene = new THREE.Scene();
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 
 const material = new THREE.MeshBasicMaterial({ 
-  color: parameters.color,
+  // color: parameters.color,
+  map: colorTexture,
   wireframe: false
 })
 
